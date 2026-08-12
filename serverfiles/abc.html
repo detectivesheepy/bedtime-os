@@ -1,35 +1,28 @@
-<div style="
-  position: relative; 
-  width: 100%; 
-  max-width: 800px; 
-  aspect-ratio: 16 / 9; 
-  overflow: hidden; 
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-">
-  <!-- CSS Pointer Mask: Prevents hover states and clicking to bring up the timeline overlay -->
-  <div style="
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    z-index: 10; 
-    background: transparent;
-  "></div>
+<script>
+  let player;
 
-  <!-- The Cropped Video Iframe -->
-  <iframe 
-    src="https://www.youtube.com/embed/vOTiJkg1voo?autoplay=1" 
-    style="
-      position: absolute;
-      top: -60px; 
-      left: 0;
-      width: 100%;
-      height: calc(100% + 120px); 
-      border: 0;
-    "
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-    allowfullscreen>
-  </iframe>
-</div>
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('yt-player', {
+      width: '100%',
+      height: '100%',
+      // 1. Insert your active video ID right here:
+      videoId: 'vOTiJkg1voo', 
+      playerVars: {
+        'autoplay': 1,
+        'mute': 1,
+        'controls': 0,          /* Natively deletes the bottom timeline track controls */
+        'modestbranding': 1,   /* Hides the oversized YouTube watermarked label overlay */
+        'rel': 0,               /* Prevents recommended grids when playback finishes */
+        'showinfo': 0,          /* Deletes the top video title header line completely */
+        'iv_load_policy': 3     /* Strips channel pop-up notes or card banners */
+      },
+      events: {
+        'onReady': onPlayerReady
+      }
+    });
+  }
+
+  function onPlayerReady(event) {
+    event.target.playVideo();
+  }
+</script>
