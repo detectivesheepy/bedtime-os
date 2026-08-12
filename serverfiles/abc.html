@@ -32,13 +32,14 @@
       z-index: 10;
       cursor: pointer;
     }
-    /* The CSS Cropping Trick: Stretches player bounds to hide UI tracks */
+    /* Heavy Crop Hack: Shifts and stretches the stream frame window heavily 
+       to drop both the top text headers and extra-thick bottom live track layouts */
     #live-stream-player {
       position: absolute;
-      top: -45px; /* Shifts the top title string completely out of frame */
+      top: -115px; /* Aggressively pushes the top header cards out of view */
       left: 0;
       width: 100%;
-      height: calc(100% + 90px); /* Extends height to force controls below bottom edge */
+      height: calc(100% + 230px); /* Increases total height so the bottom track sinks away */
       border: 0;
     }
     .unmute-banner {
@@ -73,7 +74,7 @@
     🔊 Click Screen to Unmute Live Audio
   </div>
 
-  <!-- Standard HTML IFrame with embedded active parameters and API enabled -->
+  <!-- Main Livestream URL ID loaded with JS API listener flags configured -->
   <iframe 
     id="live-stream-player"
     src="https://www.youtube.com/embed/vOTiJkg1voo" 
@@ -87,7 +88,6 @@
   const banner = document.getElementById('unmute-text');
   const playerFrame = document.getElementById('live-stream-player');
 
-  // Executes a direct browser event call straight into the frame pipeline
   trigger.addEventListener('click', function() {
     if (playerFrame && playerFrame.contentWindow) {
       // Fires a direct text-string command to safely unmute the embedded canvas
