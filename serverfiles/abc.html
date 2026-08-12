@@ -1,4 +1,7 @@
-<style>
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
     body {
       margin: 0;
       background-color: #000;
@@ -6,6 +9,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     }
     .video-wrapper {
       position: relative;
@@ -16,6 +20,7 @@
       border-radius: 8px;
       overflow: hidden;
     }
+    /* Invisible protective pane that safely intercepts user interactions */
     .click-shield {
       position: absolute;
       top: 0;
@@ -23,7 +28,32 @@
       width: 100%;
       height: 100%;
       z-index: 10;
-      background: transparent;
+      cursor: pointer;
+    }
+    /* Overlay message banner alerting user how to restore the stream audio track */
+    .unmute-banner {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      z-index: 20;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .unmute-banner.hidden {
+      opacity: 0;
+      transform: translate(-50%, 10px);
     }
     #yt-player {
       width: 100%;
@@ -35,12 +65,17 @@
 <body>
 
 <div class="video-wrapper">
-  <div class="click-shield"></div>
+  <div class="click-shield" id="unmute-trigger"></div>
+  
+  <div class="unmute-banner" id="unmute-text">
+    🔊 Click Screen to Unmute Live Audio
+  </div>
+
   <div id="yt-player"></div>
 </div>
 
-<!-- Core Google API Engine Loader Script Element -->
-<script src="https://www.youtube.com/iframe_api"></script>
+<!-- Valid, fully qualified remote Google API script engine resource -->
+<script src="https://youtube.com"></script>
 
 <script>
   let player;
@@ -49,16 +84,17 @@
     player = new YT.Player('yt-player', {
       width: '100%',
       height: '100%',
-      // 1. Insert your active video ID right here:
+      // Put your copied alphanumeric YouTube livestream ID inside these quotes:
       videoId: 'vOTiJkg1voo', 
       playerVars: {
         'autoplay': 1,
-        'mute': 1,
+        'mute': 1,              /* Mandatory default state to bypass browser video blocks */
         'controls': 0,          /* Natively deletes the bottom timeline track controls */
         'modestbranding': 1,   /* Hides the oversized YouTube watermarked label overlay */
         'rel': 0,               /* Prevents recommended grids when playback finishes */
         'showinfo': 0,          /* Deletes the top video title header line completely */
-        'iv_load_policy': 3     /* Strips channel pop-up notes or card banners */
+        'iv_load_policy': 3,    /* Strips channel pop-up notes or card banners */
+        'cc_load_policy': 0     /* Natively disables closed captions by default */
       },
       events: {
         'onReady': onPlayerReady
@@ -68,5 +104,20 @@
 
   function onPlayerReady(event) {
     event.target.playVideo();
+    
+    const trigger = document.getElementById('unmute-trigger');
+    const banner = document.getElementById('unmute-text');
+    
+    // Listens for a clean visitor physical click event to pass audio clearance
+    trigger.addEventListener('click', function() {
+      if (player && typeof player.unMute === 'function') {
+        player.unMute();
+        banner.classList.add('hidden');
+        trigger.style.pointerEvents = 'none';
+      }
+    });
   }
 </script>
+
+</body>
+</html>
