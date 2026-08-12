@@ -1,3 +1,5 @@
+<center><img src="https://raw.githubusercontent.com/detectivesheepy/bedtime-os/365ca41f05feae3926e442f106397842b1d3f639/bedtimesvg.svg"></center>
+
 ## Why use Bedtime?
 Bedtime has support for many devices, including:
 - Web
