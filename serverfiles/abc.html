@@ -53,12 +53,13 @@
       videoId: 'vOTiJkg1voo', 
       playerVars: {
         'autoplay': 1,
-        'mute': 1,
+        'mute': 0,
         'controls': 0,          /* Natively deletes the bottom timeline track controls */
         'modestbranding': 1,   /* Hides the oversized YouTube watermarked label overlay */
         'rel': 0,               /* Prevents recommended grids when playback finishes */
         'showinfo': 0,          /* Deletes the top video title header line completely */
         'iv_load_policy': 3     /* Strips channel pop-up notes or card banners */
+        'cc_load_policy': 0     /* Turns off captions */
       },
       events: {
         'onReady': onPlayerReady
