@@ -11,16 +11,18 @@
       height: 100vh;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     }
-    .video-wrapper {
+    /* The structural cropping framework container */
+    .video-container {
       position: relative;
       width: 100%;
       max-width: 800px;
       aspect-ratio: 16 / 9;
       background: #000;
       border-radius: 8px;
-      overflow: hidden;
+      overflow: hidden; /* Cleanly cuts off anything outside the boundaries */
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     }
-    /* Invisible protective pane that safely intercepts user interactions */
+    /* Invisible layer that handles the unmute mouse click interaction */
     .click-shield {
       position: absolute;
       top: 0;
@@ -30,7 +32,15 @@
       z-index: 10;
       cursor: pointer;
     }
-    /* Overlay message banner alerting user how to restore the stream audio track */
+    /* The CSS Cropping Trick: Stretches player bounds to hide UI tracks */
+    #live-stream-player {
+      position: absolute;
+      top: -45px; /* Shifts the top title string completely out of frame */
+      left: 0;
+      width: 100%;
+      height: calc(100% + 90px); /* Extends height to force controls below bottom edge */
+      border: 0;
+    }
     .unmute-banner {
       position: absolute;
       bottom: 20px;
@@ -46,77 +56,50 @@
       z-index: 20;
       pointer-events: none;
       transition: opacity 0.3s ease, transform 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
     .unmute-banner.hidden {
       opacity: 0;
       transform: translate(-50%, 10px);
     }
-    #yt-player {
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
   </style>
 </head>
 <body>
 
-<div class="video-wrapper">
+<div class="video-container">
   <div class="click-shield" id="unmute-trigger"></div>
   
   <div class="unmute-banner" id="unmute-text">
     🔊 Click Screen to Unmute Live Audio
   </div>
 
-  <div id="yt-player"></div>
+  <!-- Standard HTML IFrame with embedded active parameters and API enabled -->
+  <iframe 
+    id="live-stream-player"
+    src="https://www.youtube.com/embed/vOTiJkg1voo" 
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+    allowfullscreen>
+  </iframe>
 </div>
 
-<!-- Valid, fully qualified remote Google API script engine resource -->
-<script src="https://youtube.com"></script>
-
 <script>
-  let player;
+  const trigger = document.getElementById('unmute-trigger');
+  const banner = document.getElementById('unmute-text');
+  const playerFrame = document.getElementById('live-stream-player');
 
-  function onYouTubeIframeAPIReady() {
-    player = new YT.Player('yt-player', {
-      width: '100%',
-      height: '100%',
-      // Put your copied alphanumeric YouTube livestream ID inside these quotes:
-      videoId: 'vOTiJkg1voo', 
-      playerVars: {
-        'autoplay': 1,
-        'mute': 1,              /* Mandatory default state to bypass browser video blocks */
-        'controls': 0,          /* Natively deletes the bottom timeline track controls */
-        'modestbranding': 1,   /* Hides the oversized YouTube watermarked label overlay */
-        'rel': 0,               /* Prevents recommended grids when playback finishes */
-        'showinfo': 0,          /* Deletes the top video title header line completely */
-        'iv_load_policy': 3,    /* Strips channel pop-up notes or card banners */
-        'cc_load_policy': 0     /* Natively disables closed captions by default */
-      },
-      events: {
-        'onReady': onPlayerReady
-      }
-    });
-  }
-
-  function onPlayerReady(event) {
-    event.target.playVideo();
-    
-    const trigger = document.getElementById('unmute-trigger');
-    const banner = document.getElementById('unmute-text');
-    
-    // Listens for a clean visitor physical click event to pass audio clearance
-    trigger.addEventListener('click', function() {
-      if (player && typeof player.unMute === 'function') {
-        player.unMute();
-        banner.classList.add('hidden');
-        trigger.style.pointerEvents = 'none';
-      }
-    });
-  }
+  // Executes a direct browser event call straight into the frame pipeline
+  trigger.addEventListener('click', function() {
+    if (playerFrame && playerFrame.contentWindow) {
+      // Fires a direct text-string command to safely unmute the embedded canvas
+      playerFrame.contentWindow.postMessage(
+        JSON.stringify({ event: 'command', func: 'unMute', args: [] }), 
+        '*'
+      );
+      
+      banner.classList.add('hidden'); // Clear out the layout overlay banner
+      trigger.style.pointerEvents = 'none'; // Drops the protective pane out of rotation
+    }
+  });
 </script>
 
 </body>
