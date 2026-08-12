@@ -4,25 +4,24 @@
   <style>
     body {
       margin: 0;
+      padding: 0;
       background-color: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      overflow: hidden; /* Prevents scrollbars from appearing */
       height: 100vh;
+      width: 100vw;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     }
-    /* The structural cropping framework container */
+    
+    /* Expanded to cover the absolute full width and height of the monitor screen */
     .video-container {
       position: relative;
-      width: 100%;
-      max-width: 640px;
-      aspect-ratio: 16 / 9;
+      width: 100vw;
+      height: 100vh;
       background: #000;
-      border-radius: 8px;
-      overflow: hidden; /* Cleanly cuts off anything outside the boundaries */
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      overflow: hidden; /* Cuts off all cropped UI edges */
     }
-    /* Invisible layer that handles the unmute mouse click interaction */
+    
+    /* Invisible interactive layer for the click-to-unmute trigger */
     .click-shield {
       position: absolute;
       top: 0;
@@ -32,36 +31,39 @@
       z-index: 10;
       cursor: pointer;
     }
-    /* Heavy Crop Hack: Shifts and stretches the stream frame window heavily 
-       to drop both the top text headers and extra-thick bottom live track layouts */
+    
+    /* Uniform Percentage Zoom: 
+       Pushes controls and header strings out of view on all viewport sizes */
     #live-stream-player {
       position: absolute;
-      top: -115px; /* Aggressively pushes the top header cards out of view */
-      left: 0;
-      width: 100%;
-      height: calc(100% + 230px); /* Increases total height so the bottom track sinks away */
+      top: -15%;       
+      left: -10%;      
+      width: 120%;     
+      height: 130%;    
       border: 0;
     }
+    
+    /* Floating full-screen unmute banner */
     .unmute-banner {
       position: absolute;
-      bottom: 20px;
+      bottom: 40px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(0, 0, 0, 0.85);
       color: #fff;
-      padding: 10px 20px;
+      padding: 14px 28px;
       border-radius: 30px;
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 600;
       letter-spacing: 0.5px;
       z-index: 20;
       pointer-events: none;
       transition: opacity 0.3s ease, transform 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
     .unmute-banner.hidden {
       opacity: 0;
-      transform: translate(-50%, 10px);
+      transform: translate(-50%, 15px);
     }
   </style>
 </head>
@@ -71,10 +73,9 @@
   <div class="click-shield" id="unmute-trigger"></div>
   
   <div class="unmute-banner" id="unmute-text">
-    🔊 Click Screen to Unmute Live Audio
+    🔊 Click Anywhere to Unmute Live Audio
   </div>
 
-  <!-- Main Livestream URL ID loaded with JS API listener flags configured -->
   <iframe 
     id="live-stream-player"
     src="https://www.youtube.com/embed/vOTiJkg1voo" 
@@ -90,7 +91,7 @@
 
   trigger.addEventListener('click', function() {
     if (playerFrame && playerFrame.contentWindow) {
-      // Fires a direct text-string command to safely unmute the embedded canvas
+      // Sends the text-string unmute command straight into the YouTube API pipeline
       playerFrame.contentWindow.postMessage(
         JSON.stringify({ event: 'command', func: 'unMute', args: [] }), 
         '*'
