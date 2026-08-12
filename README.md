@@ -1,2 +1,10 @@
-# bedtime-os
-A TV-like app for Windows and Linux made to keep your life free. It comes with 1Flex for film piracy and more apps that can help you freeload fun.
+## Why use Bedtime?
+Bedtime has support for many devices, including:
+- Web
+- Linux
+- Windows
+- Xbox
+- (In development) Touch screen
+
+## What is Bedtime?
+Bedtime is a service made to help you stream shows, movies, games and other content on every device possible. Spider-man on Xbox? Done. AirConsole on a fridge? Done. Anything you can imagine is possible.
